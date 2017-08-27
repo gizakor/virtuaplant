@@ -101,7 +101,6 @@ class RasPi:
 world_running = True
 
 class World:
-
     
     @staticmethod
     def run_world():
