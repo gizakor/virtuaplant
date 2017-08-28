@@ -38,14 +38,12 @@ class MyParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write('error: %s\n' % message)
         self.print_help()
-        sys.exit(2)
-        
+        sys.exit(2)        
 # Create argparser object to add command line args and help option
 parser = MyParser(
-	description = 'This Python script starts the SCADA/ICS World Server',
-	epilog = '',
-	add_help = True)
-	
+    description = 'This Python script starts the SCADA/ICS World Server',
+    epilog = '',
+    add_help = True)
 # Add a "-i" argument to receive a filename
 parser.add_argument("-t", action = "store", dest="server_addr",
 					help = "Modbus server IP address to listen on")
@@ -65,10 +63,10 @@ log.setLevel(logging.INFO)
 # Display settings
 SCREEN_WIDTH = 580
 SCREEN_HEIGHT = 460
-FPS=50.0
+FPS = 50.0
 
 # Port the world will listen on
-MODBUS_SERVER_PORT=5020
+MODBUS_SERVER_PORT = 5020
 
 # Amount of oil spilled/processed
 oil_spilled_amount = 0
@@ -109,13 +107,13 @@ def to_pygame(p):
 def add_ball(space):
     mass = 0.01
     radius = 2
-    inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
+    inertia = pymunk.moment_for_circle(mass, 0, radius, (0, 0))
     body = pymunk.Body(mass, inertia)
     body._bodycontents.v_limit = 120
     body._bodycontents.h_limit = 1
     x = random.randint(69, 70)
     body.position = x, 565
-    shape = pymunk.Circle(body, radius, (0,0))
+    shape = pymunk.Circle(body, radius, (0, 0))
     shape.friction = 0.0
     shape.collision_type = ball_collision #liquid
     space.add(body, shape)

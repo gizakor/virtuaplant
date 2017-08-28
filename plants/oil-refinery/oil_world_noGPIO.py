@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 from __future__ import division
+
 import argparse
 import os
-import sys
-import time
-import threading
-from termcolor import colored
 import socket
-import RPi.GPIO as GPIO
+import sys
+import threading
+import time
+
+from pymodbus.datastore import (ModbusSequentialDataBlock, ModbusServerContext,
+                                ModbusSlaveContext)
+from pymodbus.device import ModbusDeviceIdentification
+from pymodbus.server.async import StartTcpServer
+from pymodbus.transaction import ModbusAsciiFramer, ModbusRtuFramer
+from termcolor import colored
 
 # PWM Module
 import Adafruit_PCA9685
-
-# - Modbus
-from pymodbus.server.async import StartTcpServer
-from pymodbus.device import ModbusDeviceIdentification
-from pymodbus.datastore import ModbusSequentialDataBlock
-from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
-from pymodbus.transaction import ModbusRtuFramer, ModbusAsciiFramer
+import RPi.GPIO as GPIO
 
 
 # GPIO Class
@@ -42,7 +42,7 @@ class RasPi:
     servo_addr_outlet = 2
     servo_addr_sep = 0
     servo_addr_waste = 1
-    
+
     # Setup the shift register control ports
     def setup_gpio(self):
         GPIO.setmode(GPIO.BCM)
@@ -53,7 +53,6 @@ class RasPi:
         GPIO.setup(self.data_clock_pin, GPIO.OUT)
         GPIO.setup(self.data_latch_pin, GPIO.OUT)
        # self.pwm.set_pwm_freq(60)
-
 
     def shift_out_values(self, storage_decimal, separator_decimal):
         GPIO.output(self.data_latch_pin, 0)
@@ -93,15 +92,19 @@ class RasPi:
         return leds_base2
 
     def set_servos(self):
-        self.pwm.set_pwm(self.servo_addr_outlet,0,self.servo_on if plc_get_tag(PLC_OUTLET_VALVE) == 1 else self.servo_off)
-        self.pwm.set_pwm(self.servo_addr_sep,0,self.servo_on if plc_get_tag(PLC_SEP_VALVE) == 1 else self.servo_off)
-        self.pwm.set_pwm(self.servo_addr_waste,0,self.servo_on if plc_get_tag(PLC_WASTE_VALVE) == 1 else self.servo_off)
-                
-    
+        #self.pwm.set_pwm(self.servo_addr_outlet, 0, self.servo_on if plc_get_tag(
+        #    PLC_OUTLET_VALVE) == 1 else self.servo_off)
+        #self.pwm.set_pwm(self.servo_addr_sep, 0, self.servo_on if plc_get_tag(
+        #    PLC_SEP_VALVE) == 1 else self.servo_off)
+        #self.pwm.set_pwm(self.servo_addr_waste, 0, self.servo_on if plc_get_tag(
+        #    PLC_WASTE_VALVE) == 1 else self.servo_off)
+
+
 world_running = True
 
+
 class World:
-    
+
     @staticmethod
     def run_world():
         # Remove Game with Hacky values
@@ -131,7 +134,7 @@ class World:
             if plc_get_tag(PLC_OUTLET_VALVE) == 1 and tank_storage_vol > 0:
                 if oil_flow_rate_sto_to_sep > tank_storage_vol:
                     tank_separator_vol += tank_storage_vol
-                    tank_storage_vol =0
+                    tank_storage_vol = 0
                 else:
                     tank_separator_vol += oil_flow_rate_sto_to_sep
                     tank_storage_vol -= oil_flow_rate_sto_to_sep
@@ -146,12 +149,12 @@ class World:
                 error += "\nStorage tank overflow!"
 
             if tank_separator_vol > tank_separator_vol_overflow:
-                plc_set_tag(PLC_OIL_UPPER,1)
+                plc_set_tag(PLC_OIL_UPPER, 1)
                 tank_separator_vol -= oil_flow_rate_overflow
                 oil_spilt += oil_flow_rate_overflow
                 error += "\nSeperator tank safety level reached"
             else:
-                plc_set_tag(PLC_OIL_UPPER,0)
+                plc_set_tag(PLC_OIL_UPPER, 0)
 
             if tank_separator_vol > 0 and plc_get_tag(PLC_SEP_VALVE) == 1:
                 if oil_flow_processed > tank_separator_vol:
@@ -175,15 +178,17 @@ class World:
 
             # Display on Raspberry Pi
             RasPi().shift_out_values(tank_storage_decimal, tank_separator_decimal)
-            #RasPi().set_servos()
+            # RasPi().set_servos()
 
             # Print info
             os.system("clear")
             print('Oil Refinery Status\n')
             print("Storage Tank Volume:    %s" % tank_storage_vol)
-            print("Storage Tank %% Full:    %.2f %%" % (tank_storage_decimal * 100))
+            print("Storage Tank %% Full:    %.2f %%" %
+                  (tank_storage_decimal * 100))
             print("Separator Tank Volume:  %s" % tank_separator_vol)
-            print("Separator Tank %% Full:  %.2f %%" % (tank_separator_decimal * 100))
+            print("Separator Tank %% Full:  %.2f %%" %
+                  (tank_separator_decimal * 100))
 
             print(colored("\nOil Feed Pump:          Stop", "red") if plc_get_tag(PLC_FEED_PUMP) == 0 else colored(
                 "\nOil Feed Pump:          Start", "green"))
@@ -194,7 +199,8 @@ class World:
             print(colored("Waste Valve:            Off", "red") if plc_get_tag(PLC_WASTE_VALVE) == 0 else colored(
                 "Waste Valve:            On", "green"))
 
-            print(colored("\nOil Processed:          %s" % oil_processed, "green"))
+            print(colored("\nOil Processed:          %s" %
+                          oil_processed, "green"))
             print(colored("Oil Spilt:              %s" % oil_spilt, "red"))
             print(colored(error, "red"))
             time.sleep(1)
@@ -247,7 +253,8 @@ def plc_get_tag(addr):
 
 def start_modbus_server():
     # Run a modbus server on specified address and modbus port (5020)
-    StartTcpServer(context, identity=identity, address=(args.server_addr , MODBUS_SERVER_PORT))
+    StartTcpServer(context, identity=identity, address=(
+        args.server_addr, MODBUS_SERVER_PORT))
 
 
 def main():
@@ -268,27 +275,30 @@ def main():
 
 # Override Argument parser to throw error and generate help message
 # if undefined args are passed
+
+
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write('error: %s\n' % message)
         self.print_help()
         sys.exit(2)
-        
+
+
 # Create argparser object to add command line args and help option
 parser = MyParser(
-	description = 'This Python script starts the SCADA/ICS World Server',
-	epilog = '',
-	add_help = True)
-	
+    description='This Python script starts the SCADA/ICS World Server',
+    epilog='',
+    add_help=True)
+
 # Add a "-i" argument to receive a filename
-parser.add_argument("-t", action = "store", dest="server_addr",
-					help = "Modbus server IP address to listen on")
+parser.add_argument("-t", action="store", dest="server_addr",
+                    help="Modbus server IP address to listen on")
 
 # Print help if no args are supplied
-if len(sys.argv)==1:
-	parser.print_help()
-	sys.exit(1)
-	
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
+
 # Split and process arguments into "args"
 args = parser.parse_args()
 

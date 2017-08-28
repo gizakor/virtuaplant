@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # IMPORTS #
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gdk, GObject
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.exceptions import ConnectionException

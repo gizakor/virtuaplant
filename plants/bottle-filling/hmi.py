@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from gi.repository import GLib, Gtk, GObject
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import GLib
+
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.exceptions import ConnectionException
 
