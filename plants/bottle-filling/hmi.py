@@ -98,7 +98,7 @@ class HMIWindow(Gtk.Window):
         elementIndex += 1
 
         IPText = Gtk.Entry()
-        IPText.set_text("%s:%s" % (address, port))
+        IPText.set_text("%s:%s" % ("localhost", 5020))
 
         IPButton = Gtk.Button("APPLY")
         IPButton.connect("clicked", self.setIPPLC)
@@ -127,7 +127,7 @@ class HMIWindow(Gtk.Window):
     def setIPPLC(self, widget):
         try:
             address,port = self.IPText.get_text().split(":")
-            self.client = Client(address, port)
+            self.client = ModbusClient(address, port)
         except:
             pass
 
