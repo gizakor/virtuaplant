@@ -127,7 +127,7 @@ class HMIWindow(Gtk.Window):
     def setIPPLC(self, widget):
         try:
             address,port = self.IPText.get_text().split(":")
-            self.client = ModbusClient(address, port)
+            self.modbusClient = ModbusClient(address, port)
         except:
             pass
 
