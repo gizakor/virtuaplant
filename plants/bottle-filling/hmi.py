@@ -97,12 +97,23 @@ class HMIWindow(Gtk.Window):
         grid.attach(stopButton, 1, elementIndex, 1, 1)
         elementIndex += 1
 
+        IPText = Gtk.Entry()
+        IPText.set_text("%s:%s" % (address, port))
+
+        IPButton = Gtk.Button("APPLY")
+        IPButton.connect("clicked", self.setIPPLC)
+
+        grid.attach(IPText, 0, elementIndex, 1, 1)
+        grid.attach(IPButton, 1, elementIndex, 1, 1)
+        elementIndex += 1
+
         # VirtuaPlant branding
         virtuaPlant = Gtk.Label()
         virtuaPlant.set_markup("<span size='small'>VirtuaPlant - HMI</span>")
         grid.attach(virtuaPlant, 0, elementIndex, 2, 1)
 
         # Attach Value Labels
+        self.IPText = IPText
         self.processStatusValue = processStatusValue
         self.connectionStatusValue = connectionStatusValue
         self.levelHitValue = levelHitValue
@@ -112,6 +123,13 @@ class HMIWindow(Gtk.Window):
 
         self.resetLabels()
         GObject.timeout_add_seconds(MODBUS_SLEEP, self.update_status)
+
+    def setIPPLC(self, widget):
+        try:
+            address,port = self.IPText.get_text().split(":")
+            self.client = Client(address, port)
+        except:
+            pass
 
     def setProcess(self, widget, data=None):
         try:

@@ -60,6 +60,14 @@ PLC_TAG_RUN = 0x10
 global bottles
 bottles = []
 
+
+def get_ip():
+    from netifaces import interfaces, ifaddresses, AF_INET
+    for ifaceName in interfaces():
+        addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+        if ifaceName == "eth0":
+            return ''.join(addresses)
+
 def to_pygame(p):
     """Small hack to convert pymunk to pygame coordinates"""
     return int(p.x), int(-p.y+600)
@@ -344,7 +352,7 @@ identity.MajorMinorRevision = '1.0'
 
 def startModbusServer():
 
-    StartTcpServer(context, identity=identity, address=("localhost", MODBUS_SERVER_PORT))
+    StartTcpServer(context, identity=identity, address=(get_ip(), MODBUS_SERVER_PORT))
 
 def main():
     reactor.callInThread(runWorld)
