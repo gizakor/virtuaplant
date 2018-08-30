@@ -100,7 +100,7 @@ class HMIWindow(Gtk.Window):
         elementIndex += 1
 
         IPText = Gtk.Entry()
-        IPText.set_text("%s:%s" % ("localhost", 5020))
+        IPText.set_text("%s:%s" % (PLANT_IP, PLANT_PORT))
 
         IPButton = Gtk.Button("APPLY")
         IPButton.connect("clicked", self.setIPPLC)
