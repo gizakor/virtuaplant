@@ -11,7 +11,7 @@ log.setLevel(logging.INFO)
 #####################################
 # Code
 #####################################
-client = ModbusClient('localhost', port=5020)
+client = ModbusClient('localhost', port=502)
 
 try:
     client.connect()
