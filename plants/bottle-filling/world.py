@@ -62,11 +62,13 @@ bottles = []
 
 
 def get_ip():
-    from netifaces import interfaces, ifaddresses, AF_INET
-    for ifaceName in interfaces():
-        addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-        if ifaceName == "eth0":
-            return ''.join(addresses)
+    return "0.0.0.0"
+
+    # from netifaces import interfaces, ifaddresses, AF_INET
+    # for ifaceName in interfaces():
+    #     addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+    #     if ifaceName == "eth0":
+    #         return ''.join(addresses)
 
 def to_pygame(p):
     """Small hack to convert pymunk to pygame coordinates"""
@@ -91,7 +93,7 @@ def add_ball(space):
 def draw_ball(screen, ball, color=THECOLORS['blue']):
     p = int(ball.body.position.x), 600-int(ball.body.position.y)
     pygame.draw.circle(screen, color, p, int(ball.radius), 2)
-    
+
 def add_bottle_in_sensor(space):
 
     body = pymunk.Body()
@@ -196,7 +198,7 @@ def level_ok(space, arbiter, *args, **kwargs):
 def bottle_in_place(space, arbiter, *args, **kwargs):
 
     log.debug("Bottle in place")
-    PLCSetTag(PLC_TAG_LIMIT_SWITCH, 1) 
+    PLCSetTag(PLC_TAG_LIMIT_SWITCH, 1)
     PLCSetTag(PLC_TAG_LEVEL_SENSOR, 0)
     PLCSetTag(PLC_TAG_NOZZLE, 1) # Open nozzle
     return False
@@ -238,7 +240,7 @@ def runWorld():
     limit_switch = add_limit_switch(space)
     level_sensor = add_level_sensor(space)
     bottle_in = add_bottle_in_sensor(space)
-    
+
     global bottles
     bottles.append(add_bottle(space))
 
@@ -260,18 +262,18 @@ def runWorld():
                 running = False
 
         screen.fill(THECOLORS["white"])
-        
+
         if PLCGetTag(PLC_TAG_RUN):
 
                 # Motor Logic
                 if (PLCGetTag(PLC_TAG_LIMIT_SWITCH) == 1):
                     PLCSetTag(PLC_TAG_MOTOR, 0)
-                
+
                 if (PLCGetTag(PLC_TAG_LEVEL_SENSOR) == 1):
                     PLCSetTag(PLC_TAG_MOTOR, 1)
-                    
+
                 ticks_to_next_ball -= 1
-                
+
                 if not PLCGetTag(PLC_TAG_LIMIT_SWITCH):
                     PLCSetTag(PLC_TAG_MOTOR, 1)
 
