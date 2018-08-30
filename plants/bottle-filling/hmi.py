@@ -8,12 +8,14 @@ from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.exceptions import ConnectionException
 
 MODBUS_SLEEP=1
+PLANT_IP = "127.0.0.1"
+PLANT_PORT = 502
 
 class HMIWindow(Gtk.Window):
 
     def initModbus(self):
 
-        self.modbusClient = ModbusClient('localhost', port=5020)
+        self.modbusClient = ModbusClient(PLANT_IP, port=PLANT_PORT)
 
     def resetLabels(self):
         self.bottlePositionValue.set_markup("<span weight='bold' foreground='gray33'>N/A</span>")
@@ -27,7 +29,7 @@ class HMIWindow(Gtk.Window):
         Gtk.Window.__init__(self, title="Bottle-filling factory - HMI - VirtuaPlant")
 
         self.set_border_width(20)
-        
+
         self.initModbus()
 
         elementIndex = 0
